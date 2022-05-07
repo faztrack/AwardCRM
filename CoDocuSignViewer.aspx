@@ -1,0 +1,34 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="CoDocuSignViewer.aspx.cs" Inherits="CoDocuSignViewer" %>
+<%@ Register assembly="CrystalDecisions.Web, Version=13.0.4000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>Untitled Page</title>
+    <style type="text/css">
+
+* {
+	margin:0;
+	padding:0;
+}
+
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+    
+        <CR:CrystalReportViewer ID="CRViewer" runat="server" 
+            AutoDataBind="true" />
+    
+    </div>
+                            <asp:HiddenField ID="hdnEstimateId" runat="server" 
+        Value="0" />
+                            <asp:HiddenField ID="hdnChangeId" 
+        runat="server" Value="0" />
+                            &nbsp;<asp:HiddenField ID="hdnCustomerId" 
+        runat="server" Value="0" />
+    </form>
+</body>
+</html>

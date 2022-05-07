@@ -1,0 +1,25 @@
+﻿
+
+
+Table = file_upload_infos
+
+type = 1 -- Vendor File
+type = 5 -- Selection
+================================
+Calendar Event Link Dependency
+
+Start Same Time = 1
+Start After Finish = 2
+Offset days = 3
+
+================================
+
+
+EmailIntegrationType
+
+value  = 1; // Outlook Email
+       
+value = 2; // Others Email (example:  Gmail)
+
+
+================================
