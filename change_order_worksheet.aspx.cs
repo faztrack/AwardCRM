@@ -832,6 +832,7 @@ public partial class change_order_worksheet : System.Web.UI.Page
                 co_obj.location_id = objcl.location_id;
                 co_obj.sales_person_id = objcl.sales_person_id;
                 co_obj.section_level = objcl.section_level;
+                co_obj.section_serial = objcl.section_serial;
                 co_obj.item_id = objcl.item_id;
                 co_obj.section_name = objcl.section_name;
                 co_obj.item_name = objcl.item_name;
@@ -1345,9 +1346,9 @@ public partial class change_order_worksheet : System.Web.UI.Page
             {
                 IsClose = true;
                 strQ = "UPDATE changeorder_estimate SET IsChangeOrderQtyViewByCust= " + ChangeOrderQtyViewByCust + ",is_cutomer_viewable = " + Convert.ToInt32(rdoconfirm.SelectedValue) + ", changeorder_name='" + lblChangeOrderName.Text.Replace("'", "''") + "', change_order_status_id=" + Convert.ToInt32(ddlStatus.SelectedValue) + ",comments='" + txtComments.Text + "',change_order_type_id=" + Convert.ToInt32(ddlChangeOrderType.SelectedValue) + ",payment_terms='" + ddlTerms.SelectedItem.Text + "', other_terms='" + txtOtherTerms.Text + "',is_total=" + Convert.ToInt32(rdoList.SelectedValue) + ",is_tax='" + btax + "',tax=" + Convert.ToDecimal(txtTaxPer.Text.Replace("%", "").Replace("$", "")) + ",total_payment_due='" + ddlTotalHeader.SelectedItem.Text + "',changeorder_date='" + txtChangeOrderDate.Text + "',execute_date='" + DateTime.Today + "',notes1='" + txtNotes1.Text + "',is_close='" + IsClose + "', last_updated_date='" + DateTime.Today + "' WHERE chage_order_id =" + Convert.ToInt32(hdnChEstId.Value) + " AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
-                MasterAdd_strQ = "UPDATE co_pricing_master SET item_status_id=1,total_retail_price=prev_total_price WHERE item_status_id = 2 AND is_direct=1 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+                MasterAdd_strQ = "UPDATE co_pricing_master SET item_status_id=1,total_retail_price=prev_total_price WHERE item_status_id = 3 AND is_direct=1 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
                 string MasterAdd_direct_strQ = "UPDATE co_pricing_master SET item_status_id=1,total_direct_price=prev_total_price WHERE item_status_id = 2 AND is_direct=2 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
-                MasterDel_strQ = "Delete co_pricing_master WHERE item_status_id = 3 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+                MasterDel_strQ = "Delete co_pricing_master WHERE item_status_id = 2 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
                 _db.ExecuteCommand(MasterAdd_strQ, string.Empty);
                 _db.ExecuteCommand(MasterAdd_direct_strQ, string.Empty);
                 _db.ExecuteCommand(MasterDel_strQ, string.Empty);
@@ -1650,7 +1651,13 @@ public partial class change_order_worksheet : System.Web.UI.Page
         if (oCom != null)
         {
             if (oCom.ChangeQtyView == 1)
-                strReportPath = Server.MapPath(@"Reports\rpt\rptchange_order.rpt");
+            {
+                if(rdoSort.SelectedValue=="1")
+                    strReportPath = Server.MapPath(@"Reports\rpt\rptchange_order.rpt");
+                else
+                    strReportPath = Server.MapPath(@"Reports\rpt\rptchange_orderbysection.rpt");
+            }
+                
             else
                 strReportPath = Server.MapPath(@"Reports\rpt\rptchange_order2.rpt");
         }

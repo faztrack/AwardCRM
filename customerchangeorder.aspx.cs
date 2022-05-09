@@ -1126,12 +1126,16 @@ public partial class customerchangeorder : System.Web.UI.Page
         {
             IsClose = true;
             strQ1 = "UPDATE changeorder_estimate SET change_order_status_id = 4,execute_date='" + DateTime.Today + "',is_close='" + IsClose + "', last_updated_date='" + DateTime.Today + "' WHERE chage_order_id =" + Convert.ToInt32(hdnCOId.Value) + " AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
-            MasterAdd_strQ = "UPDATE co_pricing_master SET item_status_id=1,total_retail_price=prev_total_price WHERE item_status_id = 2 AND is_direct=1 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
-            string MasterAdd_direct_strQ = "UPDATE co_pricing_master SET item_status_id = 1,total_direct_price=prev_total_price WHERE item_status_id = 2 AND is_direct=2 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
-            MasterDel_strQ = "Delete co_pricing_master WHERE item_status_id = 3 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+            //MasterAdd_strQ = "UPDATE co_pricing_master SET item_status_id=1,total_retail_price=prev_total_price WHERE item_status_id = 2 AND is_direct=1 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+            //string MasterAdd_direct_strQ = "UPDATE co_pricing_master SET item_status_id = 1,total_direct_price=prev_total_price WHERE item_status_id = 2 AND is_direct=2 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+            //MasterDel_strQ = "Delete co_pricing_master WHERE item_status_id = 3 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+            MasterAdd_strQ = "UPDATE co_pricing_master SET item_status_id = 1 WHERE item_status_id = 3 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+            MasterDel_strQ = "Delete co_pricing_master WHERE item_status_id = 2 AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+
+
             _db.ExecuteCommand(strQ1, string.Empty);
             _db.ExecuteCommand(MasterAdd_strQ, string.Empty);
-            _db.ExecuteCommand(MasterAdd_direct_strQ, string.Empty);
+           // _db.ExecuteCommand(MasterAdd_direct_strQ, string.Empty);
             _db.ExecuteCommand(MasterDel_strQ, string.Empty);
         }
 

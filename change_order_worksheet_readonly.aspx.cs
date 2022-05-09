@@ -52,7 +52,7 @@ public partial class change_order_worksheet_readonly : System.Web.UI.Page
 
             int nChEstid = Convert.ToInt32(Request.QueryString.Get("coestid"));
             hdnChEstId.Value = nChEstid.ToString();
-
+            btnChangeOrderRollBack.OnClientClick = "return confirm('Are you sure you want to undo this change order?');";
             if (Convert.ToInt32(hdnCustomerId.Value) > 0)
             {
                 customer cust = new customer();
@@ -116,12 +116,12 @@ public partial class change_order_worksheet_readonly : System.Web.UI.Page
                     if (cho.change_order_status_id == 3)
                     {
                         lblMessagefinal.Text = csCommonUtility.GetSystemMessage("This Change Order has executed on " + Convert.ToDateTime(cho.last_updated_date).ToShortDateString());
-
+                        btnChangeOrderRollBack.Visible = false;
                     }
                     else
                     {
                         lblMessagefinal.Text = csCommonUtility.GetSystemErrorMessage("This Change Order has declined on " + Convert.ToDateTime(cho.last_updated_date).ToShortDateString());
-
+                        btnChangeOrderRollBack.Visible = true;
                     }
                 }
 
@@ -918,9 +918,12 @@ public partial class change_order_worksheet_readonly : System.Web.UI.Page
         string strSalesPerson = "( " + sp.first_name + " " + sp.last_name + " )";
         string strCustomerName = lblCustomerName.Text;
         string strpayment_terms = "";
-        if (cho.payment_terms == "Other")
+        if (oCom.ChangeQtyView == 1)
         {
-            strpayment_terms = cho.other_terms.ToString();
+            if (rdoSort.SelectedValue == "1")
+                strReportPath = Server.MapPath(@"Reports\rpt\rptchange_order.rpt");
+            else
+                strReportPath = Server.MapPath(@"Reports\rpt\rptchange_orderbysection.rpt");
         }
         else
         {
@@ -1206,6 +1209,141 @@ public partial class change_order_worksheet_readonly : System.Web.UI.Page
         Session.Add(SessionInfo.Report_Param, ht);
 
         ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "Popup", "window.open('Reports/Common/ReportDocumentViewer_CO.aspx');", true);
+    }
+
+    protected void btnChangeOrderRollBack_Click(object sender, EventArgs e)
+    {
+        try
+        {
+
+
+
+            int i = 0;
+            DataClassesDataContext _db = new DataClassesDataContext();
+
+
+            //  Deleted Change order 
+
+
+            List<change_order_pricing_list> Pm_List = _db.change_order_pricing_lists.Where(pd => pd.estimate_id == Convert.ToInt32(hdnEstimateId.Value) && pd.customer_id == Convert.ToInt32(hdnCustomerId.Value) && pd.client_id == Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]) && pd.chage_order_id == Convert.ToInt32(hdnChEstId.Value) && pd.item_status_id == 2).ToList();
+
+
+
+            foreach (change_order_pricing_list objCpm in Pm_List)
+            {
+                co_pricing_master cpm = new co_pricing_master();
+                co_pricing_master cpmUP = _db.co_pricing_masters.FirstOrDefault(ce => ce.customer_id == Convert.ToInt32(hdnCustomerId.Value) && ce.client_id == Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]) && ce.estimate_id == Convert.ToInt32(hdnEstimateId.Value) && ce.location_id == objCpm.location_id);
+                if (cpmUP != null)
+                {
+                    cpm.sort_id = cpmUP.sort_id;
+
+                }
+
+                cpm.client_id = objCpm.client_id; ;
+                cpm.customer_id = objCpm.customer_id;
+                cpm.estimate_id = Convert.ToInt32(hdnEstimateId.Value);
+                cpm.location_id = objCpm.location_id;
+                cpm.sales_person_id = objCpm.sales_person_id;
+                cpm.section_level = objCpm.section_level;
+                cpm.item_id = objCpm.item_id;
+                cpm.section_name = objCpm.section_name;
+                cpm.item_name = objCpm.item_name;
+                cpm.measure_unit = objCpm.measure_unit;
+                cpm.quantity = objCpm.quantity;
+                cpm.is_direct = objCpm.is_direct;
+                cpm.total_direct_price = (decimal)objCpm.total_direct_price;
+                cpm.total_retail_price = (decimal)objCpm.total_retail_price;
+                cpm.section_serial = objCpm.section_serial;
+                cpm.item_cnt = 1;
+                cpm.item_status_id = objCpm.item_status_id;
+                cpm.short_notes = objCpm.short_notes;
+                cpm.create_date = DateTime.Today;
+                cpm.last_update_date = DateTime.Today;
+                cpm.prev_total_price = (decimal)objCpm.total_retail_price;
+                cpm.execution_unit = 0;
+                cpm.week_id = 1;
+                cpm.is_complete = false;
+                cpm.schedule_note = "";
+                cpm.CalEventId = 0;
+                cpm.is_CommissionExclude = objCpm.is_CommissionExclude;
+          
+               
+                _db.co_pricing_masters.InsertOnSubmit(cpm);
+                _db.SubmitChanges();
+
+
+            }
+
+
+
+
+            // Newlly Added Item Updated
+            List<change_order_pricing_list> addedItemListList = _db.change_order_pricing_lists.Where(pd => pd.estimate_id == Convert.ToInt32(hdnEstimateId.Value) && pd.customer_id == Convert.ToInt32(hdnCustomerId.Value) && pd.client_id == Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]) && pd.chage_order_id == Convert.ToInt32(hdnChEstId.Value) && pd.item_status_id == 3).ToList();
+
+            foreach (change_order_pricing_list objCpm in addedItemListList)
+            {
+
+                co_pricing_master cpmUP = _db.co_pricing_masters.FirstOrDefault(ce => ce.customer_id == Convert.ToInt32(hdnCustomerId.Value) && ce.client_id == Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]) && ce.estimate_id == Convert.ToInt32(hdnEstimateId.Value) && ce.co_pricing_list_id == objCpm.co_pricing_list_id);
+                if (cpmUP != null)
+                {
+
+                    cpmUP.item_status_id = 3;
+                    _db.SubmitChanges();
+
+                }
+            }
+
+
+
+
+
+            string strQ = "";
+
+
+            try
+            {
+
+                strQ = "UPDATE customerchangeorderstatus SET status = 1, accepteddate = '' WHERE customerid =" + Convert.ToInt32(hdnCustomerId.Value) + " AND estimateid =" + Convert.ToInt32(hdnEstimateId.Value) + " AND changeorderid =" + Convert.ToInt32(hdnChEstId.Value);
+                _db.ExecuteCommand(strQ, string.Empty);
+                _db.SubmitChanges();
+            }
+            catch
+            {
+
+            }
+
+            try
+            {
+                //bool IsClose = false;
+                strQ = "";
+                strQ = "UPDATE changeorder_estimate SET change_order_status_id=1,  execute_date='', is_close=0 WHERE chage_order_id =" + Convert.ToInt32(hdnChEstId.Value) + " AND estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+                _db.ExecuteCommand(strQ, string.Empty);
+                _db.SubmitChanges();
+            }
+            catch
+            {
+
+            }
+
+
+            try
+            {
+                string MasterDel_strQ = "Delete change_order_pricing_list WHERE chage_order_id=" + hdnChEstId.Value + " and  estimate_id =" + Convert.ToInt32(hdnEstimateId.Value) + " AND customer_id=" + Convert.ToInt32(hdnCustomerId.Value) + " AND client_id=" + Convert.ToInt32(ConfigurationManager.AppSettings["client_id"]);
+                _db.ExecuteCommand(MasterDel_strQ, string.Empty);
+                _db.SubmitChanges();
+            }
+            catch
+            {
+
+            }
+            Response.Redirect("change_order_worksheet.aspx?coestid=" + hdnChEstId.Value + "&eid=" + hdnEstimateId.Value + "&cid=" + hdnCustomerId.Value);
+
+
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 }
 

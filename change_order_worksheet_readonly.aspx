@@ -116,7 +116,8 @@
                                             <tr>
                                                 <td align="center" colspan="4">
                                                     <asp:Label ID="lblMessagefinal" runat="server" Font-Bold="True"></asp:Label>
-                                                    &nbsp;                  &nbsp;                  &nbsp;&nbsp;</td>
+                                                      &nbsp;&nbsp;&nbsp;&nbsp;<asp:Button runat="server" Text="Undo Change Order" ID="btnChangeOrderRollBack" OnClick="btnChangeOrderRollBack_Click" CssClass="button" Visible="false" />
+                                                </td>
                                             </tr>
                                         </table>
                                     </td>
